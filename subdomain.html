@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Subdomain — Ascension</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app">
+
+  <div class="page-head">
+    <a class="back-btn" id="backBtn" href="domains.html">‹</a>
+    <h1 id="subName">Subdomain</h1>
+  </div>
+
+  <div style="padding:16px 20px 0;">
+    <p id="subWhy" style="font-size:13.5px; color:var(--text-dim); line-height:1.6;"></p>
+  </div>
+
+  <!-- Signature: the Rung — tier ladder, current position highlighted -->
+  <div class="section-label"><h2>Tier Progress</h2></div>
+  <div style="padding:0 20px;">
+    <div class="rungs" id="rungs"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-label">
+    <h2>Session Pool</h2>
+    <span class="meta" id="tierMeta"></span>
+  </div>
+  <div class="slate" id="sessionPool"></div>
+
+  <div style="padding:20px;">
+    <button class="btn-primary" id="startBtn">Start today's session</button>
+  </div>
+
+  <nav class="nav">
+    <a class="nav-item" href="index.html"><span class="ic">◷</span>Today</a>
+    <a class="nav-item active" href="domains.html"><span class="ic">⬡</span>Domains</a>
+    <a class="nav-item" href="progress.html"><span class="ic">◈</span>Progress</a>
+    <a class="nav-item" href="profile.html"><span class="ic">△</span>Profile</a>
+  </nav>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const domain = getDomain(params.get('domain')) || ASCENSION_DATA.domains[0];
+  const sub = domain.subdomains.find(s => s.id === params.get('sub')) || domain.subdomains[0];
+
+  document.getElementById('backBtn').href = `domain.html?id=${domain.id}`;
+  document.getElementById('subName').textContent = sub.name;
+  document.getElementById('subWhy').textContent = sub.why;
+  document.getElementById('tierMeta').textContent = tierLabel(sub.tier);
+
+  const rungs = document.getElementById('rungs');
+  ASCENSION_DATA.tierOrder.forEach(t => {
+    const idx = ASCENSION_DATA.tierOrder.indexOf(t);
+    const curIdx = ASCENSION_DATA.tierOrder.indexOf(sub.tier);
+    let cls = 'rung';
+    if(idx < curIdx) cls += ' complete';
+    if(idx === curIdx) cls += ' current';
+    const r = document.createElement('div');
+    r.className = cls;
+    r.innerHTML = `<div class="rung-label">${tierLabel(t)}${idx===curIdx ? ' — current' : (idx < curIdx ? ' — cleared' : '')}</div>`;
+    rungs.appendChild(r);
+  });
+
+  // Placeholder session pool for the current tier — real content authored later
+  const placeholderPool = [
+    { title: `${sub.name} Session A`, minutes: 15, pts: 15 },
+    { title: `${sub.name} Session B`, minutes: 18, pts: 20 },
+    { title: `${sub.name} Session C`, minutes: 12, pts: 15 },
+  ];
+  const pool = document.getElementById('sessionPool');
+  placeholderPool.forEach((s,i) => {
+    const card = document.createElement('div');
+    card.className = 'session-card';
+    card.innerHTML = `
+      <div class="session-glyph">${domain.glyph}</div>
+      <div class="session-body">
+        <div class="session-domain">${tierLabel(sub.tier)} pool</div>
+        <div class="session-title">${s.title}</div>
+        <div class="session-meta"><span>${s.minutes} min</span><span class="dot">+${s.pts} pts</span></div>
+      </div>
+      <div class="session-chevron">›</div>
+    `;
+    pool.appendChild(card);
+  });
+</script>
+</body>
+</html>

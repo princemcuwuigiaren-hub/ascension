@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Domains — Ascension</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div class="mark">Ascen<span>sion</span></div>
+    <button class="icon-btn" id="themeToggle">☀</button>
+  </div>
+
+  <div class="section-label" style="padding-top:20px;">
+    <h2>Domains</h2>
+    <span class="meta">5 total</span>
+  </div>
+
+  <div class="domain-list" id="domainList"></div>
+
+  <nav class="nav">
+    <a class="nav-item" href="index.html"><span class="ic">◷</span>Today</a>
+    <a class="nav-item active" href="domains.html"><span class="ic">⬡</span>Domains</a>
+    <a class="nav-item" href="progress.html"><span class="ic">◈</span>Progress</a>
+    <a class="nav-item" href="profile.html"><span class="ic">△</span>Profile</a>
+  </nav>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+  const list = document.getElementById('domainList');
+  ASCENSION_DATA.domains.forEach(d => {
+    const tierIndex = t => ASCENSION_DATA.tierOrder.indexOf(t);
+    const avgTier = d.subdomains.reduce((sum,s) => sum + tierIndex(s.tier), 0) / d.subdomains.length;
+    const filledSegs = Math.round(avgTier) + 1;
+
+    const card = document.createElement('div');
+    card.className = 'domain-card';
+    card.innerHTML = `
+      <div class="domain-card-top">
+        <div class="domain-card-name"><span class="domain-card-glyph">${d.glyph}</span>${d.name}</div>
+        <div class="domain-card-pts">${d.subdomains.length} subdomains</div>
+      </div>
+      <div class="domain-card-desc">${d.overview}</div>
+      <div class="domain-progress-row">
+        ${[0,1,2].map(i => `<div class="domain-progress-seg ${i < filledSegs ? 'filled' : ''}"></div>`).join('')}
+      </div>
+    `;
+    card.addEventListener('click', () => {
+      window.location.href = `domain.html?id=${d.id}`;
+    });
+    list.appendChild(card);
+  });
+</script>
+</body>
+</html>
